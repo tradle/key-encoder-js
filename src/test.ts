@@ -2,6 +2,8 @@ import * as test from 'tape'
 // @ts-ignore
 import * as BN from 'bn.js'
 import KeyEncoder from './index'
+import { aliases, curves } from './index'
+const crypto = require('crypto')
 const ECPrivateKeyASN = KeyEncoder.ECPrivateKeyASN
 const ECPrivateKey8ASN = KeyEncoder.ECPrivateKey8ASN
 const SubjectPublicKeyInfoASN = KeyEncoder.SubjectPublicKeyInfoASN
@@ -171,3 +173,61 @@ test('encodePEMPublicKey', function(t) {
     t.equal(publicKeyDER, keys.derPublic, 'encoded DER public key should match the OpenSSL reference')
     t.end()
 })
+
+test('elliptic sign => native verify compact', function (t) {
+    var testData = 'some data',
+        hashingAlgorithm = 'sha256',
+        testDataHash = crypto.createHash(hashingAlgorithm).update(testData).digest()
+
+    for (var curveName in aliases) {
+        var curve = curves[curveName].curve,
+            keyEncoder = new KeyEncoder(curveName)
+        t.ok(keyEncoder, 'curve ' + curveName + ': created a key encoder')
+
+        var keypair = curve.genKeyPair(),
+            publixKeyHex = keypair.getPublic('hex'),
+            publicKeyPEM = keyEncoder.encodePublic(publixKeyHex, 'raw', 'pem')
+
+        var signatureOfTestData = keypair.sign(testDataHash).toDER('hex')
+        t.ok(signatureOfTestData, 'curve ' + curveName + ': signed test data')
+
+        var verified = crypto
+            .createVerify(hashingAlgorithm)
+            .update(testData)
+            .verify(publicKeyPEM, signatureOfTestData, 'hex')
+        t.ok(verified, 'curve ' + curveName + ': verified signature')
+    }
+
+    t.end()
+})
+
+test('native sign => elliptic verify compact', function (t) {
+    var testData = 'some data',
+        hashingAlgorithm = 'sha256',
+        testDataHash = crypto.createHash(hashingAlgorithm).update(testData).digest()
+
+    for (var curveName in aliases) {
+        var curve = curves[curveName].curve,
+            keyEncoder = new KeyEncoder(curveName)
+        t.ok(keyEncoder, 'curve ' + curveName + ': created a key encoder')
+
+        var ecdh = crypto.createECDH(aliases[curveName])
+        ecdh.generateKeys()
+        var privateKey = ecdh.getPrivateKey(),
+            privateKeyPEM = keyEncoder.encodePrivate(privateKey, 'raw', 'pem')
+        
+        var signatureOfTestData = crypto
+            .createSign(hashingAlgorithm)
+            .update(testData)
+            .sign(privateKeyPEM, 'hex')
+        t.ok(signatureOfTestData, 'curve ' + curveName + ': signed test data')
+
+        var verified = curve
+            .keyFromPrivate(privateKey)
+            .verify(testDataHash, signatureOfTestData)
+        t.ok(verified, 'curve ' + curveName + ': verified signature')
+    }
+
+    t.end()
+})
+

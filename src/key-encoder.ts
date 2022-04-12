@@ -1,4 +1,4 @@
-import { ec as EC } from 'elliptic'
+import { curves, CurveOptions } from './curves'
 // @ts-ignore
 import * as asn1 from 'asn1.js'
 const BN = require('bn.js')
@@ -45,22 +45,6 @@ const SubjectPublicKeyInfoASN = asn1.define('SubjectPublicKeyInfo', function () 
     )
 })
 
-interface CurveOptions {
-    curveParameters: number[];
-    privatePEMOptions: { label: string };
-    publicPEMOptions: { label: string };
-    curve: EC;
-}
-
-const curves: { [index: string]: CurveOptions } = {
-    secp256k1: {
-        curveParameters: [1, 3, 132, 0, 10],
-        privatePEMOptions: { label: 'EC PRIVATE KEY' },
-        publicPEMOptions: { label: 'PUBLIC KEY' },
-        curve: new EC('secp256k1')
-    }
-}
-
 interface PrivateKeyPKCS1 {
     version: BNjs;
     privateKey: Buffer;
@@ -89,10 +73,11 @@ export default class KeyEncoder {
 
     constructor(options: string | CurveOptions) {
         if (typeof options === 'string') {
-            if (options !== 'secp256k1') {
-                throw new Error('Unknown curve ' + options)
-            }
+            const curve = options
             options = curves[options]
+            if (!options) {
+                throw new Error(`Unknown curve ${curve}, supported curves: ${Object.keys(curves).join(', ')}`)
+            }
         }
         this.options = options
         this.algorithmID = [1, 2, 840, 10045, 2, 1]
