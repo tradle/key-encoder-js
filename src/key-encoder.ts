@@ -109,10 +109,14 @@ export default class KeyEncoder {
         }
     }
 
-    privateKeyObject(rawPrivateKey: string, rawPublicKey: string) {
+    privateKeyObject(rawPrivateKey: string | Buffer, rawPublicKey: string) {
+        const privateKey = typeof rawPrivateKey === 'string'
+            ? Buffer.from(rawPrivateKey, 'hex')
+            : rawPrivateKey
+        
         const privateKeyObject: PrivateKeyPKCS1 = {
             version: new BN(1),
-            privateKey: Buffer.from(rawPrivateKey, 'hex'),
+            privateKey,
             parameters: this.options.curveParameters
         }
 
@@ -149,8 +153,8 @@ export default class KeyEncoder {
 
         /* Parse the incoming private key and convert it to a private key object */
         if (originalFormat === 'raw') {
-            if (typeof privateKey !== 'string') {
-                throw 'private key must be a string'
+            if (typeof privateKey !== 'string' && !(privateKey instanceof Uint8Array)) {
+                throw 'private key must be a string or Buffer'
             }
             let keyPair = this.options.curve.keyFromPrivate(privateKey, 'hex')
             let rawPublicKey = keyPair.getPublic('hex')
