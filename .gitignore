@@ -29,3 +29,4 @@ node_modules
 *.pem
 .nyc_output
 lib
+package-lock.json
