@@ -1,5 +1,5 @@
 {
-  "name": "key-encoder",
+  "name": "@tradle/key-encoder",
   "version": "2.1.0",
   "description": "Library for encoding ECDSA private keys to PEM, DER and raw hex formats",
   "main": "lib/index.js",
@@ -12,7 +12,7 @@
   },
   "repository": {
     "type": "git",
-    "url": "https://github.com/blockstack/key-encoder-js.git"
+    "url": "https://github.com/tradle/key-encoder-js.git"
   },
   "keywords": [
     "elliptic",
@@ -52,9 +52,9 @@
   },
   "license": "MIT",
   "bugs": {
-    "url": "https://github.com/blockstack/key-encoder-js/issues"
+    "url": "https://github.com/tradle/key-encoder-js/issues"
   },
-  "homepage": "https://github.com/blockstack/key-encoder-js",
+  "homepage": "https://github.com/tradle/key-encoder-js",
   "dependencies": {
     "@types/elliptic": "^6.4.14",
     "asn1.js": "^5.4.1",

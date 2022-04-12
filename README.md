@@ -1,15 +1,13 @@
-# Key Encoder JS
+# @tradle/Key Encoder JS
 
-[![CircleCI](https://img.shields.io/circleci/project/blockstack/key-encoder-js/master.svg)](https://circleci.com/gh/blockstack/key-encoder-js/tree/master)
-[![npm](https://img.shields.io/npm/l/key-encoder.svg)](https://www.npmjs.com/package/key-encoder)
-[![npm](https://img.shields.io/npm/v/key-encoder.svg)](https://www.npmjs.com/package/key-encoder)
-[![npm](https://img.shields.io/npm/dm/key-encoder.svg)](https://www.npmjs.com/package/key-encoder)
-[![Slack](http://slack.blockstack.org/badge.svg)](http://slack.blockstack.org/)
+> Fork of [key-encoder][] with updated dependencies and support for more curves.
+
+[key-encoder]: https://github.com/stacks-network/key-encoder-js
 
 ### Installation
 
 ```
-$ npm install key-encoder
+$ npm install @tradle/key-encoder
 ```
 
 ### Getting Started
@@ -19,7 +17,7 @@ To get started, first define your key encoder and raw private/public keys.
 #### SECP256k1 Key Encoders
 
 ```js
-var KeyEncoder = require('key-encoder'),
+var KeyEncoder = require('@tradle/key-encoder'),
     keyEncoder = new KeyEncoder('secp256k1')
 ```
 
